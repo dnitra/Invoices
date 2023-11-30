@@ -40,6 +40,7 @@
                     </td>
                 </tr>
             @endforeach
+            <td colspan="5"><a href="{{ route('customers.create') }}" class="btn btn-primary btn-sm">Vytvořit zákazníka</a></td>
             @endif
             </tbody>
         </table>

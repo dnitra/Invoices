@@ -7,9 +7,6 @@
             <p>
                 Tento systém umožňuje správu zákazníků a vytváření faktur v režimu OSS.
             </p>
-            <p>
-                Začněte vytvořením zákazníků a poté můžete přidávat faktury.
-            </p>
         </div>
     </div>
 @endsection
