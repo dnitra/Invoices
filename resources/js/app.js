@@ -19,3 +19,15 @@ function removeRow(button) {
     row.parentNode.removeChild(row);
 }
 
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelector('#invoice-rows').addEventListener('click', (e) => {
+        if (e.target.classList.contains('remove-row')) {
+            removeRow(e.target);
+        }
+        if (e.target.classList.contains('add-row')) {
+            addRow();
+            window.scrollTo(0,document.body.scrollHeight);
+        }
+    });
+});

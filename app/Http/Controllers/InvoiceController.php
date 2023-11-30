@@ -177,7 +177,11 @@ class InvoiceController extends Controller
      */
     protected function validateInvoice(Request $request)
     {
-        $request->validate([
+        $messages = [
+            'rows.required' => 'Please add at least one item to the invoice',
+        ];
+
+        $validator = \Validator::make($request->all(), [
             'issue_date' => 'required|date',
             'taxable_supply_date' => 'required|date',
             'due_date' => 'required|date',
@@ -191,11 +195,15 @@ class InvoiceController extends Controller
             'oss_taxable_supply' => 'required|string',
             'oss_taxable_supply_currency' => 'required|in:' . implode(',', \App\Enums\Currency::getCases()),
             'customer_id' => 'required|exists:customers,id',
+            'rows' => 'required|array|min:1',
+            'rows.*.id' => 'nullable|exists:invoice_rows,id',
             'rows.*.text' => 'required|string',
             'rows.*.unit_price' => 'required|integer',
             'rows.*.quantity' => 'required|integer',
             'rows.*.vat_rate' => 'required|integer',
-        ]);
+        ], $messages);
+
+        $validator->validate();
     }
 
 }
