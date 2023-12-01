@@ -18,6 +18,8 @@ Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
 Route::resource('invoices', InvoiceController::class);
-Route::get('invoices/{invoice}/download', [InvoiceController::class, 'download'])->name('invoices.download');
+//public function downloadInvoiceXml($invoiceId)
+Route::get('invoices/{invoice}/download-xml', [InvoiceController::class, 'downloadInvoiceXml'])->name('invoices.download-xml');
 
 Route::resource('customers', CustomerController::class);
+

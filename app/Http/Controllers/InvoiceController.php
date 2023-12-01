@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\actions\XmlGenerator;
 use App\Models\Customer;
 use App\Models\InvoiceRow;
 use Illuminate\Http\Request;
@@ -162,6 +163,17 @@ class InvoiceController extends Controller
         }
     }
 
+    /**
+     * Download the invoice XML.
+     */
+    public function downloadInvoiceXml($invoiceId)
+    {
+        $invoice = Invoice::findOrFail($invoiceId); // Replace with your actual model and retrieval logic
+
+        $xmlFilePath = XmlGenerator::generateInvoiceXml($invoice);
+
+        return response()->download(storage_path("app/$xmlFilePath"));
+    }
     /**
      * Validate the invoice request.
      */

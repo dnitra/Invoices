@@ -46,7 +46,7 @@
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Jsou si jisti, že chcete smazat tuto fakturu?')">Smazat</button>
                             </form>
-                            <a href="{{ route('invoices.download', $invoice->id) }}" class="btn btn-success btn-sm">Stáhnout</a>
+                            <a href="{{ route('invoices.download-xml', $invoice->id) }}" class="btn btn-success btn-sm">Stáhnout</a>
                         </td>
                     </tr>
                 @endforeach
