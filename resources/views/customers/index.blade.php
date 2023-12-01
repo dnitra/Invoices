@@ -6,7 +6,6 @@
     <div class="container">
         <h1>Seznam zákazníků</h1>
 
-        <!-- Display a table with a list of customers -->
         <table class="table table-striped table-hover table-bordered table-sm">
             <thead>
             @if(count($customers) === 0)
@@ -40,9 +39,11 @@
                     </td>
                 </tr>
             @endforeach
-            <td colspan="5"><a href="{{ route('customers.create') }}" class="btn btn-primary btn-sm">Vytvořit zákazníka</a></td>
             @endif
             </tbody>
         </table>
+        <div class="d-flex justify-content-end">
+            <a href="{{ route('customers.create') }}" class="btn btn-primary btn-sm">Vytvořit zákazníka</a>
+        </div>
     </div>
 @endsection

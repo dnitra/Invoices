@@ -14,8 +14,6 @@
             @if(isset($invoice))
                 @method('PUT')
             @endif
-
-            <!-- General Invoice Data Table -->
             <table class="table table-bordered">
                 <tr>
                     <td><label for="issue_date" class="form-label h4 fw-bold">Datum vystavení:</label></td>
@@ -180,12 +178,8 @@
                     </tbody>
                 </table>
                 <button type="button" class="btn btn-success btn-sm add-row">Přidat řádek</button>
-
                 <br>
                 <br>
-{{--                <button type="submit" class="btn btn-primary"> alignf rigt --}}
-{{--                    {{ isset($invoice) ? 'Upravit fakturu' : 'Vytvořit fakturu' }}--}}
-{{--                </button>--}}
                 <div class="d-flex justify-content-end">
                     <button type="submit" class="btn btn-primary">
                         {{ isset($invoice) ? 'Upravit fakturu' : 'Vytvořit fakturu' }}
