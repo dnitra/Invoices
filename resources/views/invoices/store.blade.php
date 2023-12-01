@@ -3,8 +3,13 @@
 
 @section('content')
     <div class="container">
-        <h1>{{ isset($invoice->id) ? 'Upravit fakturu' : 'Vytvořit fakturu' }}</h1>
-
+        <h1>
+            {{
+                isset($invoice->id)
+                ? "Upravit fakturu č. " . ($invoice->invoice_number ?? 'Unknown')
+                : 'Vytvořit fakturu'
+            }}
+        </h1>
         <form
                 id="invoice-form"
                 action="{{ isset($invoice->id) ? route('invoices.update', $invoice->id) : route('invoices.store') }}"

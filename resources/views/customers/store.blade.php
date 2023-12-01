@@ -3,6 +3,14 @@
 
 @section('content')
     <div class="container">
+        <h1>
+            {{
+                isset($customer->id)
+                ? "Upravit zákazníka id. $customer->id"
+                : 'Vytvořit zákazníka'
+            }}
+        </h1>
+
         <form action="{{ isset($customer) ? route('customers.update', $customer->id) : route('customers.store') }}" method="POST">
             @csrf
 
