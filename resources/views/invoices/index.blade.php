@@ -50,13 +50,11 @@
                         </td>
                     </tr>
                 @endforeach
+            @else
+                <tr>
+                    <td colspan="7">Nebyly nalezeny žádné faktury.</td>
+                </tr>
             @endif
-                <td>
-                    @if(!$invoicesPresence)
-                        Nebyly nalezeny žádné faktury
-                    @endif
-                </td>
-
             </tbody>
         </table>
         <div class="d-flex justify-content-end">

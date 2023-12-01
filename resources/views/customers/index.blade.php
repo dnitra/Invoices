@@ -8,12 +8,6 @@
 
         <table class="table table-striped table-hover table-bordered table-sm">
             <thead>
-            @if(count($customers) === 0)
-                <tr>
-                    <td>Nebyli nalezeni žádní zákazníci.</td>
-                    <td><a href="{{ route('customers.create') }}" class="btn btn-primary btn-sm">Vytvořit zákazníka</a></td>
-                </tr>
-            @else
                 <tr>
                     <th scope="col">ID</th>
                     <th scope="col">Název</th>
@@ -23,7 +17,8 @@
                 </tr>
             </thead>
             <tbody>
-            @foreach($customers as $customer)
+            @if($customersPresence = count($customers) !== 0)
+                @foreach($customers as $customer)
                 <tr>
                     <td>{{ $customer->id }}</td>
                     <td>{{ $customer->name }}</td>
@@ -39,6 +34,12 @@
                     </td>
                 </tr>
             @endforeach
+            @else
+                <tr>
+                    <td colspan="7">
+                        Nebyli nalezeni žádní zákazníci.
+                    </td>
+                </tr>
             @endif
             </tbody>
         </table>
