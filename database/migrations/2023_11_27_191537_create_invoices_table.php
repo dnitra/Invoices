@@ -21,12 +21,6 @@ return new class extends Migration
             $table->enum('currency', Currency::getCases());
             $table->enum('status', \App\Enums\InvoiceStatus::getCases());
             $table->string('invoice_number');
-            $table->string('oss_regime');
-            $table->string('oss_info');
-            $table->enum('oss_country', \App\Enums\Country::getCases());
-            $table->string('oss_vat_id');
-            $table->string('oss_taxable_supply');
-            $table->string('oss_taxable_supply_currency');
             $table->timestamps();
         });
     }

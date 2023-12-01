@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use App\Models\InvoiceRow;
 use Illuminate\Http\Request;
-use App\Models\Invoice; // Assuming your Invoice model is in the App\Models namespace
+use App\Models\Invoice;
+
 
 class InvoiceController extends Controller
 {
@@ -14,7 +15,7 @@ class InvoiceController extends Controller
      */
     public function index()
     {
-        $invoices = Invoice::all(); // Replace this with your actual logic to fetch invoices from the database
+        $invoices = Invoice::all();
 
         return view('invoices.index', [
             'invoices' => $invoices,
@@ -26,9 +27,8 @@ class InvoiceController extends Controller
      */
     public function create()
     {
-        // Add logic if needed, but in this case, we're using the same form for create and edit
         return view('invoices.store', [
-            'customers' => Customer::all(), // Assuming you have a Customer model
+            'customers' => Customer::all(),
         ]);
     }
 
@@ -38,9 +38,10 @@ class InvoiceController extends Controller
     public function store(Request $request)
     {
         try {
-            $this->validateInvoice($request);
-
-            // Create or update the invoice based on whether $request has 'id' field
+            $validator = $this->createInvoiceValidator($request);
+            if ($validator->fails()) {
+                return redirect()->back()->withErrors($validator)->withInput();
+            }
             $invoice = Invoice::create($request->only([
                 'issue_date',
                 'taxable_supply_date',
@@ -49,20 +50,14 @@ class InvoiceController extends Controller
                 'currency',
                 'status',
                 'invoice_number',
-                'oss_regime',
-                'oss_info',
-                'oss_country',
-                'oss_vat_id',
-                'oss_taxable_supply',
-                'oss_taxable_supply_currency',
                 'customer_id',
             ]));
 
-            // Handle the rows associated with the invoice
             $rowsData = $request->only('rows');
             $rows = [];
             foreach ($rowsData['rows'] as $index => $row) {
                 InvoiceRow::create([
+                    'invoice_id' => $invoice->id,
                     'text' => $row['text'],
                     'quantity' => $row['quantity'],
                     'unit_price' => $row['unit_price'],
@@ -117,7 +112,11 @@ class InvoiceController extends Controller
     public function update(Request $request, string $id)
     {
         try {
-            $this->validateInvoice($request);
+            $validator = $this->createInvoiceValidator($request);
+            if ($validator->fails()) {
+                return redirect()->back()->withErrors($validator)->withInput();
+            }
+
             $invoice = Invoice::findOrFail($id);
             $invoice->update($request->only([
                 'id',
@@ -128,29 +127,20 @@ class InvoiceController extends Controller
                 'currency',
                 'status',
                 'invoice_number',
-                'oss_regime',
-                'oss_info',
-                'oss_country',
-                'oss_vat_id',
-                'oss_taxable_supply',
-                'oss_taxable_supply_currency',
                 'customer_id',
             ]));
 
-            // Handle the rows associated with the invoice
-            $rows = $request->only('rows');
             $rowsData = $request->only('rows');
-            foreach ($rowsData['rows'] as $index => $row) {
+            foreach ($rowsData['rows'] as $row) {
                 $row = InvoiceRow::findOrFail($row['id']);
                 $row->update([
+                    'invoice_id' => $invoice->id,
                     'text' => $row['text'],
                     'quantity' => $row['quantity'],
                     'unit_price' => $row['unit_price'],
                     'vat_rate' => $row['vat_rate'],
                 ]);
             }
-
-
             return redirect()->route('invoices.index')->with('success', 'Invoice saved successfully!');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Error saving the invoice. ' . $e->getMessage());
@@ -175,10 +165,30 @@ class InvoiceController extends Controller
     /**
      * Validate the invoice request.
      */
-    protected function validateInvoice(Request $request)
+    protected function createInvoiceValidator(Request $request)
     {
         $messages = [
-            'rows.required' => 'Please add at least one item to the invoice',
+            'issue_date.required' => 'Prosím vyplňte datum vystavení.',
+            'issue_date.date' => 'Prosím vyplňte platné datum vystavení.',
+            'taxable_supply_date.required' => 'Prosím vyplňte datum zdanitelného plnění.',
+            'taxable_supply_date.date' => 'Prosím vyplňte platné datum zdanitelného plnění.',
+            'due_date.required' => 'Prosím vyplňte datum splatnosti.',
+            'due_date.date' => 'Prosím vyplňte platné datum splatnosti.',
+            'currency.required' => 'Prosím vyplňte měnu.',
+            'currency.in' => 'Prosím vyplňte platnou měnu.',
+            'status.required' => 'Prosím vyplňte stav faktury.',
+            'status.in' => 'Prosím vyplňte platný stav faktury.',
+            'invoice_number.required' => 'Prosím vyplňte číslo faktury.',
+            'invoice_number.string' => 'Prosím vyplňte platné číslo faktury.',
+            'customer_id.exists' => 'Prosím vyberte platného zákazníka.',
+            'rows.*.text.required' => 'Prosím vyplňte text položky.',
+            'rows.*.text.string' => 'Prosím vyplňte platný text položky.',
+            'rows.*.unit_price.required' => 'Prosím vyplňte cenu položky.',
+            'rows.*.unit_price.integer' => 'Prosím vyplňte platnou cenu položky.',
+            'rows.*.quantity.required' => 'Prosím vyplňte množství položky.',
+            'rows.*.quantity.integer' => 'Prosím vyplňte platné množství položky.',
+            'rows.*.vat_rate.required' => 'Prosím vyplňte sazbu DPH položky.',
+            'rows.*.vat_rate.integer' => 'Prosím vyplňte platnou sazbu DPH položky.',
         ];
 
         $validator = \Validator::make($request->all(), [
@@ -188,13 +198,7 @@ class InvoiceController extends Controller
             'currency' => 'required|in:' . implode(',', \App\Enums\Currency::getCases()),
             'status' => 'required|in:' . implode(',', \App\Enums\InvoiceStatus::getCases()),
             'invoice_number' => 'required|string',
-            'oss_regime' => 'required|string',
-            'oss_info' => 'required|string',
-            'oss_country' => 'required|in:' . implode(',', \App\Enums\Country::getCases()),
-            'oss_vat_id' => 'required|string',
-            'oss_taxable_supply' => 'required|string',
-            'oss_taxable_supply_currency' => 'required|in:' . implode(',', \App\Enums\Currency::getCases()),
-            'customer_id' => 'required|exists:customers,id',
+            'customer_id' => 'exists:customers,id',
             'rows' => 'required|array|min:1',
             'rows.*.id' => 'nullable|exists:invoice_rows,id',
             'rows.*.text' => 'required|string',
@@ -203,7 +207,7 @@ class InvoiceController extends Controller
             'rows.*.vat_rate' => 'required|integer',
         ], $messages);
 
-        $validator->validate();
+        return $validator;
     }
 
 }

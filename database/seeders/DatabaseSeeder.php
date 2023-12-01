@@ -16,19 +16,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        //  $table->id();
-        //            $table->string('name')->nullable();
-        //            $table->string('street')->nullable();
-        //            $table->string('city')->nullable();
-        //            $table->string('zip')->nullable();
-        //            $table->enum('country', [\App\Enums\Country::getCases()])->default(\App\Enums\Country::Cesko)->nullable();
-        //            $table->string('vat_id');
-        //            $table->string('email')->nullable();
-        //            $table->string('phone')->nullable();
-        //            $table->string('bank_account')->nullable();
-        //            $table->string('bank_code')->nullable();
-        //            $table->string('bank_name')->nullable();
-        //            $table->timestamps();
 
         Customer::create([
             'name' => 'Jan Novák',
@@ -45,18 +32,12 @@ class DatabaseSeeder extends Seeder
         ]);
         Invoice::create([
             'customer_id' => 1,
-            'issue_date' => '2021-01-01',
-            'taxable_supply_date' => '2021-01-01',
-            'due_date' => '2021-01-01',
+            'issue_date' => '2023-12-01',
+            'taxable_supply_date' => '2023-12-01',
+            'due_date' => '2023-12-14',
             'currency' => 'CZK',
             'status' => 'Nezaplaceno',
             'invoice_number' => '2021-01-01',
-            'oss_regime' => 'OSS',
-            'oss_info' => 'OSS',
-            'oss_country' => 'CZ',
-            'oss_vat_id' => 'CZ12345678',
-            'oss_taxable_supply' => 'OSS',
-            'oss_taxable_supply_currency' => 'CZK',
         ]);
 
         InvoiceRow::create([
@@ -66,6 +47,13 @@ class DatabaseSeeder extends Seeder
             'unit_price' => 100,
             'vat_rate' => 21
         ]);
-    }
 
+        InvoiceRow::create([
+            'invoice_id' => 1,
+            'text' => 'Testovací položka 2',
+            'quantity' => 2,
+            'unit_price' => 200,
+            'vat_rate' => 21
+        ]);
+    }
 }

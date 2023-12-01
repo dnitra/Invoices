@@ -16,6 +16,7 @@ function addRow() {
 
 function removeRow(button) {
     const row = button.parentNode.parentNode;
+    console.log(row)
     row.parentNode.removeChild(row);
 }
 
