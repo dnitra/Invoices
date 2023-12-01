@@ -91,7 +91,7 @@ class CustomerController extends Controller
 
     protected function validateCustomer(Request $request)
     {
-        return $request->validate([
+         $request->validate([
             'name' => 'required|string',
             'street' => 'nullable|string',
             'city' => 'nullable|string',
@@ -104,5 +104,14 @@ class CustomerController extends Controller
             'bank_code' => 'nullable|string',
             'bank_name' => 'nullable|string',
         ]);
+
+         $validator = new \Ibericode\Vat\Validator();
+
+        if (!$validator->validateVatNumberFormat($request->vat_id)) {
+            throw new \Exception('Špatný formát DIČ.');
+        }
+        if (!$validator->validateVatNumber($request->vat_id)) {
+            throw new \Exception('DIČ nenalezeno.');
+        }
     }
 }
