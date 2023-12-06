@@ -36,7 +36,16 @@
                         </td>
                         <td>{{ \Carbon\Carbon::parse($invoice->issue_date)->format('d. m. Y') }}</td>
                         <td>{{ \Carbon\Carbon::parse($invoice->due_date)->format('d. m. Y') }}</td>
-                        <td>{{ $invoice->amount }} {{ $invoice->currency }}</td>
+                        <td>
+                            @php
+                                $total = 0;
+                                foreach($invoice->rows as $row) {
+                                    $total += $row->unit_price * $row->quantity;
+                                }
+                            @endphp
+                            {{ $total }}
+                            {{ $invoice->currency }}
+                        </td>
                         <td>
                             <a href="{{ route('invoices.edit', $invoice->id) }}" class="btn btn-primary btn-sm">Upravit</a>
                             <form action="{{ route('invoices.destroy', $invoice->id) }}" method="POST" class="d-inline">
