@@ -29,7 +29,7 @@ class InvoiceController extends Controller
     public function create()
     {
         return view('invoices.store', [
-            'customers' => Customer::all(),
+            'customers' => Customer::all(['id', 'name']),
         ]);
     }
 
@@ -208,7 +208,6 @@ class InvoiceController extends Controller
             'taxable_supply_date' => 'required|date',
             'due_date' => 'required|date',
             'currency' => 'required|in:' . implode(',', \App\Enums\Currency::getCases()),
-            'status' => 'required|in:' . implode(',', \App\Enums\InvoiceStatus::getCases()),
             'invoice_number' => 'required|string',
             'customer_id' => 'exists:customers,id',
             'rows' => 'required|array|min:1',

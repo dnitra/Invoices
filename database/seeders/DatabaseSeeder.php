@@ -2,8 +2,6 @@
 
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use App\Enums\VatRate;
 use App\Models\Customer;
 use App\Models\Invoice;
 use App\Models\InvoiceRow;
@@ -22,7 +20,7 @@ class DatabaseSeeder extends Seeder
             'street' => 'Korunní 2569/108',
             'city' => 'Praha',
             'zip' => '10100',
-            'country' => 'CZ',
+            'country' => 'PL',
             'vat_id' => 'CZ12345678',
             'email' => 'janNovak@testemail.cz',
             'phone' => '+420 123 456 789',
@@ -36,7 +34,6 @@ class DatabaseSeeder extends Seeder
             'taxable_supply_date' => '2023-12-01',
             'due_date' => '2023-12-14',
             'currency' => 'CZK',
-            'status' => 'Nezaplaceno',
             'invoice_number' => '2021-01-01',
         ]);
 

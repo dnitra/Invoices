@@ -19,7 +19,6 @@ return new class extends Migration
             $table->date('taxable_supply_date');
             $table->date('due_date');
             $table->enum('currency', Currency::getCases());
-            $table->enum('status', \App\Enums\InvoiceStatus::getCases());
             $table->string('invoice_number');
             $table->timestamps();
         });

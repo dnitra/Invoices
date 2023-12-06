@@ -60,19 +60,6 @@
                     <td>@error('currency')<div class="text-danger">{{ $message }}</div>@enderror</td>
                 </tr>
                 <tr>
-                    <td><label for="status" class="form-label h4 fw-bold">Stav:</label></td>
-                    <td>
-                        <select class="form-select" name="status">
-                            @foreach(\App\Enums\InvoiceStatus::cases() as $status)
-                                <option value="{{ $status }}" {{ (isset($invoice->id) && $invoice->status == $status) || old('status') == $status ? 'selected' : '' }}>
-                                    {{ $status }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </td>
-                    <td>@error('status')<div class="text-danger">{{ $message }}</div>@enderror</td>
-                </tr>
-                <tr>
                     <td><label for="invoice_number" class="form-label h4 fw-bold">Číslo faktury:</label></td>
                     <td>
                         <input type="text" class="form-control" name="invoice_number" value="{{ isset($invoice->id) ? $invoice->invoice_number : old('invoice_number') }}">
@@ -82,7 +69,7 @@
                 <tr>
                     <td><label for="customer_id" class="form-label h4 fw-bold">Zákazník:</label></td>
                     <td>
-                        <select class="form-select" name="customer_id">
+                        <select class="form-select" name="customer_id" id="customer_id">
                             <option value="">Vyberte zákazníka</option>
                             @foreach($customers as $customer)
                                 <option value="{{ $customer->id }}" {{ (isset($invoice->id) && $invoice->customer_id == $customer->id) || old('customer_id') == $customer->id ? 'selected' : '' }}>
@@ -90,8 +77,15 @@
                                 </option>
                             @endforeach
                         </select>
+                        <div id="customer-info" class="container mt-3">
+                            {{--comes through app.js fetch--}}
+                        </div>
                     </td>
-                    <td>@error('customer_id')<div class="text-danger">{{ $message }}</div>@enderror</td>
+                    <td>
+                        @error('customer_id')
+                        <div class="text-danger">{{ $message }}</div>
+                        @enderror
+                    </td>
                 </tr>
             </table>
 
