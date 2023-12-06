@@ -9,12 +9,11 @@
         <table class="table table-striped table-hover table-bordered table-sm">
             <thead>
                 <tr>
-                    <th scope="col">ID</th>
+                    <th scope="col">VS</th>
                     <th scope="col">Odběratel</th>
                     <th scope="col">Datum vystavení</th>
                     <th scope="col">Splatnost</th>
                     <th scope="col">Částka</th>
-                    <th scope="col">Stav</th>
                     <th scope="col">Akce</th>
                 </tr>
             </thead>
@@ -22,7 +21,7 @@
             @if($invoicesPresence = count($invoices) !== 0)
                 @foreach($invoices as $invoice)
                     <tr>
-                        <td>{{ $invoice->id }}</td>
+                        <td>{{ $invoice->invoice_number }}</td>
                         <td>
                             @if($invoice->customer)
                                 <a
@@ -38,7 +37,6 @@
                         <td>{{ \Carbon\Carbon::parse($invoice->issue_date)->format('d. m. Y') }}</td>
                         <td>{{ \Carbon\Carbon::parse($invoice->due_date)->format('d. m. Y') }}</td>
                         <td>{{ $invoice->amount }} {{ $invoice->currency }}</td>
-                        <td>{{ $invoice->status }}</td>
                         <td>
                             <a href="{{ route('invoices.edit', $invoice->id) }}" class="btn btn-primary btn-sm">Upravit</a>
                             <form action="{{ route('invoices.destroy', $invoice->id) }}" method="POST" class="d-inline">
