@@ -77,7 +77,7 @@ class CustomerController extends Controller
 
             return redirect()->route('customers.index')->with('success', 'Zákazník byl úspěšně upraven.');
         } catch (\Exception $e) {
-            return redirect()->route('customers.index')->with('error', 'Chyba při úpravě zákazníka. ' . $e->getMessage());
+            return redirect()->route('customers.index')->with('error', 'Chyba při úpravě zákazníka. ' . $e->getMessage())->withInput();
         }
     }
 
@@ -106,7 +106,6 @@ class CustomerController extends Controller
             'vat_id.unique' => 'Zadané DIČ již existuje.',
             'vat_id.vat' => 'Zadané DIČ není platné.',
         ];
-        //+ add custom validation rule with ibercodes\vat\validator
 
         $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
             'name' => 'required|string',
@@ -114,7 +113,7 @@ class CustomerController extends Controller
             'city' => 'nullable|string',
             'zip' => 'nullable|string',
             'country' => 'required|in:' . implode(',', Country::getCases()),
-            'vat_id' => 'required|string|unique:customers,vat_id',
+            'vat_id' => 'string|unique:customers,vat_id',
             'email' => 'nullable|email',
             'phone' => 'nullable|string',
             'bank_account' => 'nullable|string',
@@ -123,12 +122,11 @@ class CustomerController extends Controller
         ], $messages);
         $validator->after(function ($validator) use ($request) {
             $vatValidator = new \Ibericode\Vat\Validator();
+            if (!isset($request->vat_id)) return;
+
             if (!$vatValidator->validateVatNumberFormat($request->vat_id)) {
                 $validator->errors()->add('vat_id', 'Špatný formát DIČ.');
             }
-//            if (!$vatValidator->validateVatNumber($request->vat_id)) {
-//                $validator->errors()->add('vat_id', 'DIČ není platné.');
-//            }
         });
         return $validator;
     }

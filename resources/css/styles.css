@@ -21,3 +21,25 @@ h2 {
     align-items: center;
     gap: 1rem;
 }
+
+td {
+    position: relative;
+}
+
+td label::before {
+    content: attr(data-tooltip);
+    display: none;
+    position: absolute;
+    top: 30px;
+    color: red;
+    padding: 5px;
+    border-radius: 3px;
+    z-index: 1;
+    white-space: nowrap;
+}
+
+td:hover label::before {
+    display: block;
+}
+
+

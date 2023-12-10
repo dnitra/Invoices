@@ -87,6 +87,22 @@
                         @enderror
                     </td>
                 </tr>
+                <tr>
+                    <td>
+                        <label for="oss" class="form-label h4 fw-bold" data-tooltip="Pouzijte sazbu dane platnou v celneksem statu spotrebitele">OSS:</label>
+                    </td>
+                    <td>
+                        <select class="form-select" name="oss" id="oss">
+                            <option value="0" {{ (isset($invoice->id) && $invoice->oss == 0) || old('oss') == 0 ? 'selected' : '' }}>
+                                Ne
+                            </option>
+                            <option value="1" {{ (isset($invoice->id) && $invoice->oss == 1) || old('oss') == 1 ? 'selected' : '' }}>
+                                Ano
+                            </option>
+                        </select>
+                    </td>
+                    <td>@error('oss')<div class="text-danger">{{ $message }}</div>@enderror</td>
+                </tr>
             </table>
 
             <div id="invoice-rows" class="mb-3">
@@ -147,9 +163,6 @@
                 </div>
 
             </div>
-
-        </form>
-    </div>
 
         </form>
     </div>

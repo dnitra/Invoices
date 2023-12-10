@@ -52,6 +52,7 @@ class InvoiceController extends Controller
                 'status',
                 'invoice_number',
                 'customer_id',
+                'oss'
             ]));
 
             $rowsData = $request->only('rows');
@@ -68,9 +69,9 @@ class InvoiceController extends Controller
 
             $invoice->rows()->createMany($rows);
 
-            return redirect()->route('invoices.index')->with('success', 'Invoice saved successfully!');
+            return redirect()->route('invoices.index')->with('success', "Faktura č. $invoice->invoice_number byla úspěšně vytvořena.");
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Error saving the invoice. ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Chyba při vytváření faktury. ' . $e->getMessage())->withInput();
         }
     }
 
@@ -86,7 +87,7 @@ class InvoiceController extends Controller
                 'invoice' => $invoice,
             ]);
         } catch (\Exception $e) {
-            return redirect()->route('invoices.index')->with('error', 'Invoice not found.');
+            return redirect()->route('invoices.index')->with('error', 'Faktura nebyla nalezena.');
         }
     }
 
@@ -103,7 +104,7 @@ class InvoiceController extends Controller
                 'customers' => Customer::all(),
             ]);
         } catch (\Exception $e) {
-            return redirect()->route('invoices.index')->with('error', 'Invoice not found.');
+            return redirect()->route('invoices.index')->with('error', 'Faktura nebyla nalezena.');
         }
     }
 
@@ -112,50 +113,24 @@ class InvoiceController extends Controller
      */
     public function update(Request $request, string $id)
     {
-
         try {
             $validator = $this->createInvoiceValidator($request);
+
             if ($validator->fails()) {
                 return redirect()->back()->withErrors($validator)->withInput();
             }
 
             $invoice = Invoice::findOrFail($id);
-            $invoice->update($request->only([
-                'id',
-                'issue_date',
-                'taxable_supply_date',
-                'due_date',
-                'total_price',
-                'currency',
-                'status',
-                'invoice_number',
-                'customer_id',
-            ]));
+            $this->updateInvoice($invoice, $request);
 
             $rowsData = $request->only('rows');
-            foreach ($rowsData['rows'] as $row) {
-                if (isset($row['id'])) {
-                    $row = InvoiceRow::findOrFail($row['id']);
-                    $row->update([
-                        'invoice_id' => $invoice->id,
-                        'text' => $row['text'],
-                        'quantity' => $row['quantity'],
-                        'unit_price' => $row['unit_price'],
-                        'vat_rate' => $row['vat_rate'],
-                    ]);
-                } else{
-                    InvoiceRow::create([
-                        'invoice_id' => $invoice->id,
-                        'text' => $row['text'],
-                        'quantity' => $row['quantity'],
-                        'unit_price' => $row['unit_price'],
-                        'vat_rate' => $row['vat_rate'],
-                    ]);
-                }
-            }
-            return redirect()->route('invoices.index')->with('success', 'Invoice saved successfully!');
+
+            $this->deleteUnselectedRows($invoice, $rowsData);
+            $this->updateOrCreateRows($invoice, $rowsData['rows']);
+
+            return redirect()->route('invoices.index')->with('success', "Faktura č. $invoice->invoice_number byla úspěšně upravena.");
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Error saving the invoice. ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Chyba při úpravě faktury. ' . $e->getMessage());
         }
     }
 
@@ -168,9 +143,9 @@ class InvoiceController extends Controller
             $invoice = Invoice::findOrFail($id);
             $invoice->rows()->delete();
             $invoice->delete();
-            return redirect()->route('invoices.index')->with('success', 'Invoice deleted successfully!');
+            return redirect()->route('invoices.index')->with('success', "Faktura č. $invoice->invoice_number byla úspěšně smazána.");
         } catch (\Exception $e) {
-            return redirect()->route('invoices.index')->with('error', 'Error deleting the invoice. ' . $e->getMessage());
+            return redirect()->route('invoices.index')->with('error', 'Chyba při mazání faktury. ' . $e->getMessage());
         }
     }
 
@@ -179,8 +154,7 @@ class InvoiceController extends Controller
      */
     public function downloadInvoiceXml($invoiceId)
     {
-        $invoice = Invoice::findOrFail($invoiceId); // Replace with your actual model and retrieval logic
-
+        $invoice = Invoice::findOrFail($invoiceId);
         $xmlFilePath = XmlGenerator::generateInvoiceXml($invoice);
 
         return response()->download(storage_path("app/$xmlFilePath"));
@@ -231,5 +205,62 @@ class InvoiceController extends Controller
 
         return $validator;
     }
+    private function updateInvoice(Invoice $invoice, Request $request)
+    {
+        $invoice->update($request->only([
+            'id',
+            'issue_date',
+            'taxable_supply_date',
+            'due_date',
+            'total_price',
+            'currency',
+            'status',
+            'invoice_number',
+            'customer_id',
+            'oss'
+        ]));
+    }
 
+    private function deleteUnselectedRows(Invoice $invoice, array $rowsData)
+    {
+        $rowIds = array_column($rowsData['rows'], 'id');
+        $invoice->rows()->whereNotIn('id', $rowIds)->delete();
+    }
+
+    private function updateOrCreateRows(Invoice $invoice, array $rowsData)
+    {
+        foreach ($rowsData as $row) {
+            $rowId = $row['id'] ?? null;
+
+            if ($rowId) {
+                $this->updateRow($rowId, $row);
+            } else {
+                $this->createRow($invoice, $row);
+            }
+        }
+    }
+
+    private function updateRow(int $rowId, array $row)
+    {
+        $invoiceRow = InvoiceRow::findOrFail($rowId);
+        $this->fillRow($invoiceRow, $row);
+        $invoiceRow->save();
+    }
+
+    private function createRow(Invoice $invoice, array $row)
+    {
+        $invoiceRow = new InvoiceRow();
+        $this->fillRow($invoiceRow, $row);
+        $invoice->rows()->save($invoiceRow);
+    }
+
+    private function fillRow(InvoiceRow $invoiceRow, array $row)
+    {
+        $invoiceRow->fill([
+            'text' => $row['text'],
+            'quantity' => $row['quantity'],
+            'unit_price' => $row['unit_price'],
+            'vat_rate' => $row['vat_rate'],
+        ]);
+    }
 }
