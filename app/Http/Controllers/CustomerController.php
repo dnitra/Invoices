@@ -96,24 +96,21 @@ class CustomerController extends Controller
         }
     }
 
-    protected function validateCustomer(Request $request)
+    protected function validateCustomer(Request $request): \Illuminate\Validation\Validator
     {
 
         $messages = [
             'name.required' => 'Název je povinný.',
             'country.required' => 'Země je povinná.',
-            'vat_id.required' => 'DIČ je povinné.',
-            'vat_id.unique' => 'Zadané DIČ již existuje.',
-            'vat_id.vat' => 'Zadané DIČ není platné.',
         ];
 
-        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+        $validator = \Validator::make($request->all(), [
             'name' => 'required|string',
             'street' => 'nullable|string',
             'city' => 'nullable|string',
             'zip' => 'nullable|string',
             'country' => 'required|in:' . implode(',', Country::getCases()),
-                        'vat_id' => 'nullable|string|vat',
+            'vat_id' => 'nullable|string',
             'email' => 'nullable|email',
             'phone' => 'nullable|string',
             'bank_account' => 'nullable|string',
@@ -125,8 +122,12 @@ class CustomerController extends Controller
             if (!isset($request->vat_id)) return;
 
             if (!$vatValidator->validateVatNumberFormat($request->vat_id)) {
-                $validator->errors()->add('vat_id', 'Špatný formát DIČ.');
+                $validator->errors()->add('vat_id', 'Neplatný formát DIČ.');
             }
+            if (!$vatValidator->validateVatNumber($request->vat_id)) {
+                $validator->errors()->add('vat_id', 'DIČ neexistuje v systému VIES.');
+            }
+
         });
         return $validator;
     }

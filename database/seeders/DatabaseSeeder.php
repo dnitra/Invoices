@@ -24,17 +24,15 @@ class DatabaseSeeder extends Seeder
             'vat_id' => 'CZ12345678',
             'email' => 'janNovak@testemail.cz',
             'phone' => '+420 123 456 789',
-            'bank_account' => '123456789',
-            'bank_code' => '1234',
-            'bank_name' => 'Česká spořitelna',
         ]);
         Invoice::create([
             'customer_id' => 1,
+            'invoice_text' => 'Testovací faktura',
             'issue_date' => '2023-12-01',
             'taxable_supply_date' => '2023-12-01',
             'due_date' => '2023-12-14',
             'currency' => 'CZK',
-            'invoice_number' => '2021-01-01',
+            'invoice_number' => '20230101',
         ]);
 
         InvoiceRow::create([

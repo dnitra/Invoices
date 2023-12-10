@@ -88,7 +88,7 @@
                         @enderror
                     </td>
                     <td>
-                        <input type="text" class="form-control" name="vat_id" value="{{ old('vat_id', isset($customer) ? $customer->vat_id : '') }}" required>
+                        <input type="text" class="form-control" name="vat_id" value="{{ old('vat_id', isset($customer) ? $customer->vat_id : '') }}">
                     </td>
                 </tr>
                 <tr>
