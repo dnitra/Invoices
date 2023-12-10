@@ -15,13 +15,13 @@
                 action="{{ isset($invoice->id) ? route('invoices.update', $invoice->id) : route('invoices.store') }}"
                 method="POST">
             @csrf
-
             @if(isset($invoice->id))
                 @method('PUT')
             @else
                 @php
-                    $invoice= new \App\Models\Invoice();
-                    $invoice['rows'][0] = new \App\Models\InvoiceRow();
+// -------------- Neni efektivni zpusob pocitani finalni castky, ale pro demo aplikaci funkcni =================
+                        $invoice= new \App\Models\Invoice();
+                        $invoice['rows'][0] = new \App\Models\InvoiceRow();
                 @endphp
             @endif
             <table class="table table-bordered">

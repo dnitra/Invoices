@@ -3,7 +3,25 @@ import './bootstrap';
 
 function addRow() {
     const table = document.querySelector('#invoice-rows tbody');
-    const newRow = table.rows[0].cloneNode(true);
+    const newRow = document.createElement('tr');
+    const nextIndex = table.getElementsByTagName('tr').length;
+    newRow.innerHTML = `
+        <td>
+            <input type="text" class="form-control" name="rows[${nextIndex}][text]">
+        </td>
+        <td>
+            <input type="number" class="form-control" name="rows[${nextIndex}][unit_price]">
+        </td>
+        <td>
+            <input type="number" class="form-control" name="rows[${nextIndex}][quantity]">
+        </td>
+        <td>
+            <input type="number" class="form-control" name="rows[${nextIndex}][vat_rate]">
+        </td>
+        <td>
+            <button type="button" class="btn btn-danger btn-sm remove-row">Odstranit</button>
+        </td>
+    `;
 
     // Clear input values
     const inputs = newRow.getElementsByTagName('input');
@@ -29,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (e.target.classList.contains('add-row')) {
             addRow();
-            window.scrollTo(0,document.body.scrollHeight);
+            window.scrollTo(0, document.body.scrollHeight);
         }
     });
 

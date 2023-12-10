@@ -37,6 +37,7 @@ class InvoiceController extends Controller
      */
     public function store(Request $request)
     {
+
         try {
             $validator = $this->createInvoiceValidator($request);
             if ($validator->fails()) {
@@ -111,6 +112,7 @@ class InvoiceController extends Controller
      */
     public function update(Request $request, string $id)
     {
+
         try {
             $validator = $this->createInvoiceValidator($request);
             if ($validator->fails()) {
@@ -132,14 +134,24 @@ class InvoiceController extends Controller
 
             $rowsData = $request->only('rows');
             foreach ($rowsData['rows'] as $row) {
-                $row = InvoiceRow::findOrFail($row['id']);
-                $row->update([
-                    'invoice_id' => $invoice->id,
-                    'text' => $row['text'],
-                    'quantity' => $row['quantity'],
-                    'unit_price' => $row['unit_price'],
-                    'vat_rate' => $row['vat_rate'],
-                ]);
+                if (isset($row['id'])) {
+                    $row = InvoiceRow::findOrFail($row['id']);
+                    $row->update([
+                        'invoice_id' => $invoice->id,
+                        'text' => $row['text'],
+                        'quantity' => $row['quantity'],
+                        'unit_price' => $row['unit_price'],
+                        'vat_rate' => $row['vat_rate'],
+                    ]);
+                } else{
+                    InvoiceRow::create([
+                        'invoice_id' => $invoice->id,
+                        'text' => $row['text'],
+                        'quantity' => $row['quantity'],
+                        'unit_price' => $row['unit_price'],
+                        'vat_rate' => $row['vat_rate'],
+                    ]);
+                }
             }
             return redirect()->route('invoices.index')->with('success', 'Invoice saved successfully!');
         } catch (\Exception $e) {
