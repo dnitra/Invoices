@@ -21,4 +21,5 @@ class Invoice extends Model
         return $this->hasMany(InvoiceRow::class);
     }
 
+    //automatically add value 'totalPrice' to the invoice based on the sum of all rows
 }

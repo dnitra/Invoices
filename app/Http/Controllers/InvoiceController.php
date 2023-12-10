@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\actions\XmlGenerator;
+use App\Actions\XmlGenerator;
 use App\Models\Customer;
 use App\Models\InvoiceRow;
 use Illuminate\Http\Request;
@@ -52,7 +52,8 @@ class InvoiceController extends Controller
                 'status',
                 'invoice_number',
                 'customer_id',
-                'oss'
+                'oss',
+                'invoice_text'
             ]));
 
             $rowsData = $request->only('rows');
@@ -171,6 +172,8 @@ class InvoiceController extends Controller
             'taxable_supply_date.date' => 'Prosím vyplňte platné datum zdanitelného plnění.',
             'due_date.required' => 'Prosím vyplňte datum splatnosti.',
             'due_date.date' => 'Prosím vyplňte platné datum splatnosti.',
+            'invoice_text.required' => 'Prosím vyplňte text faktury.',
+            'invoice_text.max' => 'Prosím vyplňte maximálně 240 znaků.',
             'currency.required' => 'Prosím vyplňte měnu.',
             'currency.in' => 'Prosím vyplňte platnou měnu.',
             'status.required' => 'Prosím vyplňte stav faktury.',
@@ -192,6 +195,7 @@ class InvoiceController extends Controller
             'issue_date' => 'required|date',
             'taxable_supply_date' => 'required|date',
             'due_date' => 'required|date',
+            'invoice_text' => 'required|string|max:240',
             'currency' => 'required|in:' . implode(',', \App\Enums\Currency::getCases()),
             'invoice_number' => 'required|string',
             'customer_id' => 'exists:customers,id',
@@ -217,7 +221,8 @@ class InvoiceController extends Controller
             'status',
             'invoice_number',
             'customer_id',
-            'oss'
+            'oss',
+            'invoice_text'
         ]));
     }
 
