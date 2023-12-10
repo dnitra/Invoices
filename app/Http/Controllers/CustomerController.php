@@ -113,7 +113,7 @@ class CustomerController extends Controller
             'city' => 'nullable|string',
             'zip' => 'nullable|string',
             'country' => 'required|in:' . implode(',', Country::getCases()),
-            'vat_id' => 'string|unique:customers,vat_id',
+                        'vat_id' => 'nullable|string|vat',
             'email' => 'nullable|email',
             'phone' => 'nullable|string',
             'bank_account' => 'nullable|string',
