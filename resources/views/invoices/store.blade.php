@@ -178,7 +178,13 @@
                                 @enderror
                             </td>
                             <td>
-                                <input type="number" class="form-control" name="rows[{{ $index }}][vat_rate]" value="{{ old("rows.{$index}.vat_rate", $row->vat_rate ?? 0) }}">
+                                <select class="form-select vat-rate" name="rows[{{ $index }}][vat_rate]">
+                                    @foreach($vatRates as $vatRateIndex => $vatRate)
+                                        <option value="{{ $vatRate }}" {{ (isset($invoice->id) && $row->vat_rate == $vatRate) || old("rows.{$index}.vat_rate", $vatRateIndex == 0 ? $vatRate : '') == $vatRate ? 'selected' : '' }}>
+                                            {{ $vatRate }}%
+                                        </option>
+                                    @endforeach
+                                </select>
                                 @error("rows.{$index}.vat_rate")
                                 <div class="text-danger">{{ $message }}</div>
                                 @enderror
@@ -195,7 +201,8 @@
                 <button type="button" class="btn btn-success btn-sm add-row">Přidat řádek</button>
                 <br>
                 <br>
-                <div class="d-flex justify-content-end">
+                <div class="d-flex justify-between">
+
                     <button type="submit" class="btn btn-primary">
                         {{ isset($invoice->id) ? 'Upravit fakturu' : 'Vytvořit fakturu' }}
                     </button>

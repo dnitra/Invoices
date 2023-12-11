@@ -20,6 +20,6 @@ Route::get('/', function () {
 Route::resource('invoices', InvoiceController::class);
 //public function downloadInvoiceXml($invoiceId)
 Route::get('invoices/{invoice}/download-xml', [InvoiceController::class, 'downloadInvoiceXml'])->name('invoices.download-xml');
-
+Route::get('invoices/vat-rates/{country}', [InvoiceController::class, 'getVatRates'])->name('invoices.vat-rates');
 Route::resource('customers', CustomerController::class);
 

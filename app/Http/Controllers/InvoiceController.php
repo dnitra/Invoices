@@ -29,6 +29,7 @@ class InvoiceController extends Controller
     {
         return view('invoices.store', [
             'customers' => Customer::all(['id', 'name']),
+            'vatRates' => $this->getVatRates('CZ'),
         ]);
     }
 
@@ -103,6 +104,7 @@ class InvoiceController extends Controller
             return view('invoices.store', [
                 'invoice' => $invoice,
                 'customers' => Customer::all(),
+                'vatRates' => $this->getVatRates($invoice->customer->country),
             ]);
         } catch (\Exception $e) {
             return redirect()->route('invoices.index')->with('error', 'Faktura nebyla nalezena.');
@@ -267,5 +269,22 @@ class InvoiceController extends Controller
             'unit_price' => $row['unit_price'],
             'vat_rate' => $row['vat_rate'],
         ]);
+    }
+
+    public function getVatRates(string $country)
+    {
+        $vatRates = [];
+        switch ($country) {
+            case 'CZ':
+                $vatRates = \App\Enums\VatCountries\CzVat::getCases();
+                break;
+            case 'PL':
+                $vatRates = \App\Enums\VatCountries\PlVat::getCases();
+                break;
+            case 'SK':
+                $vatRates = \App\Enums\VatCountries\SkVat::getCases();
+                break;
+        }
+        return $vatRates;
     }
 }

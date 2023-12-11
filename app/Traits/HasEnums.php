@@ -10,6 +10,7 @@ trait HasEnums
             fn($case) => $case->value,
             self::cases()
         );
+
     }
 
 }
