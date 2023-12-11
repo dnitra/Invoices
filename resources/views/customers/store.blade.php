@@ -72,7 +72,7 @@
                     </td>
                     <td>
                         <select class="form-select" name="country" required>
-                            @foreach(\App\Enums\Country::cases() as $country)
+                            @foreach(\App\Enums\Country::getCases() as $country)
                                 <option value="{{ $country }}" {{ old('country', isset($customer) ? $customer->country : '') === $country ? 'selected' : '' }}>
                                     {{ $country }}
                                 </option>
