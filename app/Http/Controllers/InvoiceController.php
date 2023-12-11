@@ -243,12 +243,12 @@ class InvoiceController extends Controller
 
             case TaxMode::Domestic->value:
                 if ($customer->country !== Country::Cesko->value) {
-                    $validator->errors()->add('tax_mode', 'Zákazník musí být z České republiky, ale je z ' . $customer->country);
+                    $validator->errors()->add('tax_mode', 'Zákazník musí být z České republiky, aby bulo možné použít Domácí režim.');
                 }
                 break;
             case TaxMode::OSS->value:
                 if ($customer->country === Country::Cesko->value) {
-                    $validator->errors()->add('tax_mode', 'Zákazník musí být z jiné země než České republiky, ale je z ' . $customer->country);
+                    $validator->errors()->add('tax_mode', 'Zákazník musí být z jiné země než České republiky, aby bylo možné použít režim OSS.');
                 }
                 if ($customer->is_vat_payer) {
                     $validator->errors()->add('tax_mode', 'Zákazník nemůže být plátce DPH, aby bylo možné použít režim OSS.');
@@ -256,7 +256,7 @@ class InvoiceController extends Controller
                 break;
             case TaxMode::ReverseCharge->value:
                 if (!$customer->vat_id) {
-                    $validator->errors()->add('tax_mode', 'Zákazník musí mít zadané DIČ, aby bylo možné použít režim reverse charge.');
+                    $validator->errors()->add('tax_mode', 'Zákazník musí mít zadané DIČ, aby bylo možné použít režim Rreverse charge.');
                 }
                 break;
         }
