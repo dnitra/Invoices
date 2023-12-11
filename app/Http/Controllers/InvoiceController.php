@@ -250,7 +250,7 @@ class InvoiceController extends Controller
                 if ($customer->country === Country::Cesko->value) {
                     $validator->errors()->add('tax_mode', 'Zákazník musí být z jiné země než České republiky, aby bylo možné použít režim OSS.');
                 }
-                if ($customer->is_vat_payer) {
+                if ($customer->vat_id) {
                     $validator->errors()->add('tax_mode', 'Zákazník nemůže být plátce DPH, aby bylo možné použít režim OSS.');
                 }
                 break;
