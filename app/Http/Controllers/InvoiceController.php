@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Actions\XmlGenerator;
+use App\Enums\Country;
+use App\Enums\TaxMode;
 use App\Models\Customer;
 use App\Models\InvoiceRow;
 use Illuminate\Http\Request;
@@ -30,6 +32,7 @@ class InvoiceController extends Controller
         return view('invoices.store', [
             'customers' => Customer::all(['id', 'name']),
             'vatRates' => $this->getVatRates('CZ'),
+            'taxModes' => \App\Enums\TaxMode::getCases(),
         ]);
     }
 
@@ -41,6 +44,7 @@ class InvoiceController extends Controller
 
         try {
             $validator = $this->createInvoiceValidator($request);
+
             if ($validator->fails()) {
                 return redirect()->back()->withErrors($validator)->withInput();
             }
@@ -53,7 +57,7 @@ class InvoiceController extends Controller
                 'status',
                 'invoice_number',
                 'customer_id',
-                'oss',
+                'tax_mode',
                 'invoice_text'
             ]));
 
@@ -105,6 +109,7 @@ class InvoiceController extends Controller
                 'invoice' => $invoice,
                 'customers' => Customer::all(),
                 'vatRates' => $this->getVatRates($invoice->customer->country),
+                'taxModes' => \App\Enums\TaxMode::getCases(),
             ]);
         } catch (\Exception $e) {
             return redirect()->route('invoices.index')->with('error', 'Faktura nebyla nalezena.');
@@ -209,6 +214,9 @@ class InvoiceController extends Controller
             'rows.*.vat_rate' => 'required|integer',
         ], $messages);
 
+        $validator->after(function ($validator) use ($request) {
+            $this->validateTaxMode($validator, $request);
+        });
         return $validator;
     }
     private function updateInvoice(Invoice $invoice, Request $request)
@@ -223,9 +231,35 @@ class InvoiceController extends Controller
             'status',
             'invoice_number',
             'customer_id',
-            'oss',
+            'tax_mode',
             'invoice_text'
         ]));
+    }
+
+    private function validateTaxMode($validator, Request $request)
+    {
+        $customer = Customer::findOrFail($request->customer_id);
+        switch ($request->tax_mode) {
+
+            case TaxMode::Domestic->value:
+                if ($customer->country !== Country::Cesko->value) {
+                    $validator->errors()->add('tax_mode', 'Zákazník musí být z České republiky, ale je z ' . $customer->country);
+                }
+                break;
+            case TaxMode::OSS->value:
+                if ($customer->country === Country::Cesko->value) {
+                    $validator->errors()->add('tax_mode', 'Zákazník musí být z jiné země než České republiky, ale je z ' . $customer->country);
+                }
+                if ($customer->is_vat_payer) {
+                    $validator->errors()->add('tax_mode', 'Zákazník nemůže být plátce DPH, aby bylo možné použít režim OSS.');
+                }
+                break;
+            case TaxMode::ReverseCharge->value:
+                if (!$customer->vat_id) {
+                    $validator->errors()->add('tax_mode', 'Zákazník musí mít zadané DIČ, aby bylo možné použít režim reverse charge.');
+                }
+                break;
+        }
     }
 
     private function deleteUnselectedRows(Invoice $invoice, array $rowsData)

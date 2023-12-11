@@ -5,8 +5,6 @@ namespace App\Enums\VatCountries;
 use App\Traits\HasEnums;
 
 enum PlVat: int
-
-
 {
     use HasEnums;
     case Zero = 0;

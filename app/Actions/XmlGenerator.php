@@ -2,6 +2,7 @@
 
 namespace App\Actions;
 
+use App\Enums\TaxMode;
 use Illuminate\Support\Facades\Storage;
 
 class XmlGenerator
@@ -50,7 +51,7 @@ class XmlGenerator
         $account->addChild('typ:accountNo', $invoice->customer->bank_account);
         $account->addChild('typ:bankCode', $invoice->customer->bank_code);
 
-        if (isset($invoice->oss)) {
+        if ($invoice->tax_mode === TaxMode::OSS->value) {
             $moss = $invoiceHeader->addChild('inv:MOSS');
             $moss->addChild('typ:ids', $invoice->oss);
             $classificationVAT = $invoiceHeader->addChild('inv:classificationVAT');
@@ -65,8 +66,7 @@ class XmlGenerator
             $invoiceItem->addChild('inv:unitPrice', $row->unit_price);
             $invoiceItem->addChild('inv:vatRate', $row->vat_rate);
 
-            // Add <inv:typeServiceMOSS> for each invoice item
-            if (isset($invoice->oss)) {
+            if ($invoice->tax_mode === TaxMode::OSS->value) {
                 $typeServiceMoss = $invoiceItem->addChild('inv:typeServiceMOSS');
                 $typeServiceMoss->addChild('typ:ids', 'SB');
             }

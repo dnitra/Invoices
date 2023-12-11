@@ -121,24 +121,22 @@
                 <tr>
                     <td>
                         <label
-                            for="oss"
+                            for="tax_mode"
                             class="form-label h4 fw-bold"
-                            data-tooltip="Použijte sazbu daně platnou v celém státu spotřebitele"
                         >
-                            OSS:
+                            Daňový režim:
                         </label>
-                        @error('oss')
+                        @error('tax_mode')
                         <div class="text-danger">{{ $message }}</div>
                         @enderror
                     </td>
                     <td>
-                        <select class="form-select" name="oss" id="oss">
-                            <option value="0" {{ (isset($invoice->id) && $invoice->oss == 0) || old('oss') == 0 ? 'selected' : '' }}>
-                                Ne
-                            </option>
-                            <option value="1" {{ (isset($invoice->id) && $invoice->oss == 1) || old('oss') == 1 ? 'selected' : '' }}>
-                                Ano
-                            </option>
+                        <select class="form-select" name="tax_mode" id="tax_mode">
+                            @foreach(\App\Enums\TaxMode::getCases() as $taxMode)
+                                <option value="{{ $taxMode }}" {{ (isset($invoice->id) && $invoice->tax_mode == $taxMode) || old('tax_mode') == $taxMode ? 'selected' : '' }}>
+                                    {{ $taxMode }}
+                                </option>
+                            @endforeach
                         </select>
                     </td>
                 </tr>

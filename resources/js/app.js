@@ -49,17 +49,14 @@ function addRow() {
 
 function removeRow(button) {
     const row = button.parentNode.parentNode;
-    console.log(row)
     row.parentNode.removeChild(row);
 }
 
 function fetchVatRatesForCustomerCountry(country){
     const url = `/invoices/vat-rates/${country}`;
-    console.log(url)
     fetch(url)
         .then(response => response.json())
         .then(data => {
-            console.log(data)
             // Update the invoice rows with correct VAT rates
             const vatRateSelects = document.querySelectorAll('select.vat-rate');
             vatRateSelects.forEach(select => {
